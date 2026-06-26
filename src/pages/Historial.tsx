@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { SEO } from '@/components/seo/SEO'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -79,9 +80,12 @@ export function Historial() {
               Cuando uses cualquiera de nuestras calculadoras y presiones "Guardar en historial",
               aparecerá aquí.
             </p>
-            <Button as="a" href="/calculadora-de-notas" className="mt-6">
+            <Link
+              to="/calculadora-de-notas"
+              className="btn-base gradient-bg px-4 py-2.5 text-sm sm:text-base text-white font-semibold mt-6 inline-flex"
+            >
               Ir a la calculadora
-            </Button>
+            </Link>
           </Card>
         ) : (
           <div className="space-y-3">

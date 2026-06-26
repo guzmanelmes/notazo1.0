@@ -44,8 +44,8 @@ export function Input({
             'border-gray-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20',
             'dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500',
             'dark:focus:border-brand-400',
-            leftIcon && 'pl-10',
-            suffix && 'pr-12',
+            Boolean(leftIcon) && 'pl-10',
+            Boolean(suffix) && 'pr-12',
             error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
             className
           )}
