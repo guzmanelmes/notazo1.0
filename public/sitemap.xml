@@ -16,6 +16,21 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://notazo.cl/puntaje-a-nota</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://notazo.cl/nem</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://notazo.cl/escala-de-notas</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://notazo.cl/calculadora-examen-final</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -26,8 +41,38 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://notazo.cl/historial</loc>
+    <loc>https://notazo.cl/dashboard</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://notazo.cl/blog</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://notazo.cl/blog/como-calcular-promedio-ponderado-chile</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://notazo.cl/blog/que-nota-necesito-para-aprobar</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://notazo.cl/blog/convertir-puntaje-a-nota-chile</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://notazo.cl/blog/nem-notas-ensenanza-media-paes</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://notazo.cl/blog/como-eximir-examen-final</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

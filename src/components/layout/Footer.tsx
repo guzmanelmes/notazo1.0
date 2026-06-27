@@ -5,24 +5,26 @@ const SECTIONS = [
     title: 'Calculadoras',
     links: [
       { to: '/calculadora-de-notas', label: 'Calculadora de Notas' },
-      { to: '/que-nota-necesito', label: 'Qué Nota Necesito' },
-      { to: '/calculadora-examen-final', label: 'Calculadora Examen Final' },
+      { to: '/que-nota-necesito', label: '¿Qué Nota Necesito?' },
+      { to: '/puntaje-a-nota', label: 'Puntaje a Nota' },
+      { to: '/calculadora-examen-final', label: 'Examen Final' },
       { to: '/simulador-eximicion', label: 'Simulador de Eximición' },
+      { to: '/nem', label: 'Calculadora NEM' },
     ],
   },
   {
-    title: 'Recursos',
+    title: 'Aprende',
     links: [
-      { to: '/historial', label: 'Historial' },
-      { to: '/', label: 'Inicio' },
+      { to: '/escala-de-notas', label: 'Escala de Notas' },
+      { to: '/blog', label: 'Blog Educativo' },
+      { to: '/dashboard', label: 'Dashboard' },
     ],
   },
   {
     title: 'Información',
     links: [
-      { to: '/', label: 'Acerca de' },
-      { to: '/', label: 'Preguntas Frecuentes' },
-      { to: '/', label: 'Contacto' },
+      { to: '/historial', label: 'Mi Historial' },
+      { to: '/', label: 'Inicio' },
     ],
   },
 ]

@@ -17,6 +17,20 @@ const SimuladorEximicion = lazy(() =>
   import('@/pages/SimuladorEximicion').then((m) => ({ default: m.SimuladorEximicion }))
 )
 const Historial = lazy(() => import('@/pages/Historial').then((m) => ({ default: m.Historial })))
+const PuntajeANota = lazy(() =>
+  import('@/pages/PuntajeANota').then((m) => ({ default: m.PuntajeANota }))
+)
+const Nem = lazy(() => import('@/pages/Nem').then((m) => ({ default: m.Nem })))
+const EscalaNotas = lazy(() =>
+  import('@/pages/EscalaNotas').then((m) => ({ default: m.EscalaNotas }))
+)
+const Dashboard = lazy(() =>
+  import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard }))
+)
+const Blog = lazy(() => import('@/pages/Blog').then((m) => ({ default: m.Blog })))
+const BlogPost = lazy(() =>
+  import('@/pages/BlogPost').then((m) => ({ default: m.BlogPost }))
+)
 const NotFound = lazy(() => import('@/pages/NotFound').then((m) => ({ default: m.NotFound })))
 
 function PageFallback() {
@@ -64,6 +78,54 @@ export default function App() {
           element={
             <Suspense fallback={<PageFallback />}>
               <SimuladorEximicion />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/puntaje-a-nota"
+          element={
+            <Suspense fallback={<PageFallback />}>
+              <PuntajeANota />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/nem"
+          element={
+            <Suspense fallback={<PageFallback />}>
+              <Nem />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/escala-de-notas"
+          element={
+            <Suspense fallback={<PageFallback />}>
+              <EscalaNotas />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <Suspense fallback={<PageFallback />}>
+              <Dashboard />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/blog"
+          element={
+            <Suspense fallback={<PageFallback />}>
+              <Blog />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/blog/:slug"
+          element={
+            <Suspense fallback={<PageFallback />}>
+              <BlogPost />
             </Suspense>
           }
         />

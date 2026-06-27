@@ -326,3 +326,110 @@ export function validarPonderacion(n: number): boolean {
 }
 
 export const _unused = { clamp } // evita warning si se importa solo
+
+// ============================================
+// Conversión Puntaje -> Nota (escala chilena)
+// ============================================
+
+export interface PuntajeParams {
+  puntaje: number
+  puntajeMaximo: number
+  exigencia?: number // % mínimo de aprobación (por defecto 60%)
+  notaMinima?: number // nota mínima para 100% (por defecto 4.0)
+}
+
+export interface PuntajeResult {
+  nota: number
+  porcentaje: number
+  aprobado: boolean
+  mensaje: string
+}
+
+/**
+ * Convierte un puntaje a nota chilena (1.0 - 7.0) usando la fórmula estándar
+ * de las universidades chilenas (similar a la usada en PAES).
+ *
+ * Lógica:
+ * - Si puntaje < exigencia: nota = 1.0 + (puntaje / exigencia) * (notaAprobacion - 1.0)
+ * - Si puntaje >= exigencia: nota = notaAprobacion + ((puntaje - exigencia) / (max - exigencia)) * (7.0 - notaAprobacion)
+ */
+export function puntajeANota(params: PuntajeParams): PuntajeResult {
+  const { puntaje, puntajeMaximo, exigencia = 60, notaMinima = 4.0 } = params
+
+  if (puntajeMaximo <= 0) {
+    return { nota: 0, porcentaje: 0, aprobado: false, mensaje: 'Puntaje máximo inválido' }
+  }
+  if (puntaje < 0 || puntaje > puntajeMaximo) {
+    return { nota: 0, porcentaje: 0, aprobado: false, mensaje: `El puntaje debe estar entre 0 y ${puntajeMaximo}` }
+  }
+  if (exigencia <= 0 || exigencia >= 100) {
+    return { nota: 0, porcentaje: 0, aprobado: false, mensaje: 'La exigencia debe estar entre 0 y 100%' }
+  }
+
+  const porcentaje = (puntaje / puntajeMaximo) * 100
+  const exigenciaAbs = (exigencia / 100) * puntajeMaximo
+
+  let nota: number
+  if (puntaje < exigenciaAbs) {
+    // Escala de 1.0 (0%) a notaAprobacion (exigencia%)
+    nota = 1.0 + (puntaje / exigenciaAbs) * (notaMinima - 1.0)
+  } else {
+    // Escala de notaAprobacion (exigencia%) a 7.0 (100%)
+    nota = notaMinima + ((puntaje - exigenciaAbs) / (puntajeMaximo - exigenciaAbs)) * (7.0 - notaMinima)
+  }
+
+  nota = roundTo(clamp(nota, 1.0, 7.0), 2)
+  const aprobado = nota >= 4.0
+
+  return {
+    nota,
+    porcentaje: roundTo(porcentaje, 1),
+    aprobado,
+    mensaje: aprobado
+      ? `Equivale a un ${nota.toFixed(2)}. ¡Aprobado!`
+      : `Equivale a un ${nota.toFixed(2)}. Bajo 4.0 (no aprobado).`,
+  }
+}
+
+// ============================================
+// Cálculo NEM (Notas de Enseñanza Media)
+// ============================================
+
+export interface NemParams {
+  notas: number[] // Notas de 1° a 4° medio (puede ser 4 o más notas por año)
+  // Si pasas 4 notas, se promedian como un solo promedio anual
+}
+
+export interface NemResult {
+  promedio: number
+  mensaje: string
+}
+
+/**
+ * Calcula el NEM (promedio de notas de enseñanza media).
+ * En Chile, el NEM se calcula como el promedio de las notas de 1° a 4° medio,
+ * incluyendo todas las asignaturas. Esta función recibe un array con los
+ * promedios anuales o con todas las notas (lo calcula de forma flexible).
+ */
+export function calcularNEM(params: NemParams): NemResult {
+  const { notas } = params
+
+  if (notas.length === 0) {
+    return { promedio: 0, mensaje: 'Agrega al menos una nota' }
+  }
+
+  const notasValidas = notas.filter(
+    (n) => !Number.isNaN(n) && n >= ESCALA_MIN && n <= ESCALA_MAX
+  )
+
+  if (notasValidas.length === 0) {
+    return { promedio: 0, mensaje: 'No hay notas válidas (1.0 a 7.0)' }
+  }
+
+  const promedio = notasValidas.reduce((acc, n) => acc + n, 0) / notasValidas.length
+
+  return {
+    promedio: roundTo(promedio, 2),
+    mensaje: `Tu NEM es ${promedio.toFixed(2)}. Se promediaron ${notasValidas.length} notas.`,
+  }
+}

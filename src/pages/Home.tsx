@@ -110,17 +110,17 @@ export function Home() {
             color="emerald"
           />
           <ToolCard
-            to="/calculadora-examen-final"
-            title="Examen Final"
-            description="Calcula la nota mínima en el examen para aprobar el ramo."
-            icon={<BookIcon />}
+            to="/puntaje-a-nota"
+            title="Puntaje a Nota"
+            description="Convierte cualquier puntaje a la escala chilena 1.0-7.0."
+            icon={<ConvertIcon />}
             color="amber"
           />
           <ToolCard
-            to="/simulador-eximicion"
-            title="Simulador de Eximición"
-            description="Averigua si te eximes según tu promedio actual."
-            icon={<AwardIcon />}
+            to="/nem"
+            title="Calculadora NEM"
+            description="Calcula tu promedio de enseñanza media para la PAES."
+            icon={<GraduationIcon />}
             color="purple"
           />
         </div>
@@ -157,16 +157,16 @@ export function Home() {
               title="Modo oscuro"
               description="Cuida tu vista con el modo oscuro automático o manual."
             />
-            <FeatureCard
-              icon={<CloudIcon />}
-              title="Sin instalación"
-              description="Abre la página y listo. No necesitas descargar nada."
-            />
-            <FeatureCard
-              icon={<FileIcon />}
-              title="Exporta a PDF"
-              description="Descarga tu historial en PDF para imprimir o compartir."
-            />
+          <FeatureCard
+            icon={<CloudIcon />}
+            title="Sin instalación"
+            description="Abre la página y listo. No necesitas descargar nada."
+          />
+          <FeatureCard
+            icon={<ChartIcon />}
+            title="Dashboard con gráficos"
+            description="Visualiza tu rendimiento por semestre y la distribución de tus notas."
+          />
           </div>
         </div>
       </section>
@@ -442,6 +442,34 @@ function TargetIcon() {
       <circle cx="12" cy="12" r="10" />
       <circle cx="12" cy="12" r="6" />
       <circle cx="12" cy="12" r="2" />
+    </svg>
+  )
+}
+
+function ConvertIcon() {
+  return (
+    <svg {...ICON_BASE} aria-hidden="true">
+      <path d="M3 7h13l-3-3M21 17H8l3 3" />
+    </svg>
+  )
+}
+
+function GraduationIcon() {
+  return (
+    <svg {...ICON_BASE} aria-hidden="true">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+    </svg>
+  )
+}
+
+function ChartIcon() {
+  return (
+    <svg {...ICON_BASE} aria-hidden="true">
+      <path d="M3 3v18h18" />
+      <rect x="7" y="13" width="3" height="5" rx="1" />
+      <rect x="12" y="9" width="3" height="9" rx="1" />
+      <rect x="17" y="5" width="3" height="13" rx="1" />
     </svg>
   )
 }

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { SEO } from '@/components/seo/SEO'
 import { Card, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -7,7 +8,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import { AdBannerTop } from '@/components/ads/AdBannerTop'
 import { AdBannerMiddle } from '@/components/ads/AdBannerMiddle'
 import { AdBannerBottom } from '@/components/ads/AdBannerBottom'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { useSemestres } from '@/hooks/useSemestres'
 import { useHistory } from '@/hooks/useHistory'
 import {
   calcularPromedioPonderado,
@@ -19,8 +20,6 @@ import {
 import { cn, uid } from '@/lib/utils'
 import type { Evaluacion } from '@/types'
 
-const STORAGE_KEY = 'notazo:calculadora'
-
 function crearEvaluacionVacia(): Evaluacion {
   return {
     id: uid('eval'),
@@ -31,28 +30,34 @@ function crearEvaluacionVacia(): Evaluacion {
 }
 
 export function CalculadoraNotas() {
-  const [evaluaciones, setEvaluaciones] = useLocalStorage<Evaluacion[]>(STORAGE_KEY, [
-    { id: uid('eval'), nombre: 'Prueba 1', nota: null, ponderacion: 30 },
-    { id: uid('eval'), nombre: 'Prueba 2', nota: null, ponderacion: 30 },
-    { id: uid('eval'), nombre: 'Examen', nota: null, ponderacion: 40 },
-  ])
-  const [errores, setErrores] = useState<Record<string, string>>({})
+  const {
+    semestres,
+    semestreActivo,
+    semestreActivoId,
+    setSemestreActivo,
+    crearSemestre,
+    eliminarSemestre,
+    renombrarSemestre,
+    actualizarEvaluaciones,
+  } = useSemestres()
+  const [nuevoSemestre, setNuevoSemestre] = useState('')
+  const [editandoNombre, setEditandoNombre] = useState(false)
+  const [nombreTemp, setNombreTemp] = useState('')
   const { addEntry } = useHistory()
 
-  // Recalcular resultado en cada cambio
+  const evaluaciones = semestreActivo?.evaluaciones ?? []
   const resultado = useMemo(() => calcularPromedioPonderado(evaluaciones), [evaluaciones])
-
   const colores = colorPorPromedio(resultado.promedio)
 
-  // Guardar en historial solo cuando sea un cálculo válido (botón manual)
   const handleGuardar = () => {
-    if (!resultado.valido) return
+    if (!resultado.valido || !semestreActivo) return
     addEntry({
       tipo: 'promedio',
-      titulo: 'Cálculo de promedio',
+      titulo: `Promedio: ${semestreActivo.nombre}`,
       resumen: `${evaluaciones.filter((e) => e.nota !== null).length} evaluaciones con promedio ${resultado.promedio.toFixed(2)}`,
       promedio: resultado.promedio,
       datos: {
+        semestre: semestreActivo.nombre,
         evaluaciones: evaluaciones.map((e) => ({
           nombre: e.nombre,
           nota: e.nota,
@@ -61,45 +66,58 @@ export function CalculadoraNotas() {
         sumaPonderaciones: resultado.sumaPonderaciones,
       },
     })
-    // Feedback simple
     const btn = document.getElementById('btn-guardar')
     if (btn) {
       const original = btn.textContent
       btn.textContent = '✓ Guardado'
-      setTimeout(() => {
-        if (btn) btn.textContent = original
-      }, 1500)
+      setTimeout(() => { if (btn) btn.textContent = original }, 1500)
     }
   }
 
+  const handleCrear = () => {
+    const nombre = nuevoSemestre.trim() || `Semestre ${semestres.length + 1}`
+    crearSemestre(nombre)
+    setNuevoSemestre('')
+  }
+
+  const handleEliminar = (id: string, nombre: string) => {
+    if (confirm(`¿Eliminar "${nombre}" y todas sus evaluaciones?`)) {
+      eliminarSemestre(id)
+    }
+  }
+
+  const handleRenombrar = () => {
+    if (semestreActivoId && nombreTemp.trim()) {
+      renombrarSemestre(semestreActivoId, nombreTemp)
+    }
+    setEditandoNombre(false)
+    setNombreTemp('')
+  }
+
   const agregar = () => {
-    setEvaluaciones((prev) => [...prev, crearEvaluacionVacia()])
+    if (!semestreActivoId) return
+    actualizarEvaluaciones(semestreActivoId, [...evaluaciones, crearEvaluacionVacia()])
   }
 
   const eliminar = (id: string) => {
-    setEvaluaciones((prev) => prev.filter((e) => e.id !== id))
-    setErrores((prev) => {
-      const next = { ...prev }
-      delete next[id]
-      return next
-    })
+    if (!semestreActivoId) return
+    actualizarEvaluaciones(
+      semestreActivoId,
+      evaluaciones.filter((e) => e.id !== id)
+    )
   }
 
   const limpiar = () => {
-    if (confirm('¿Borrar todas las evaluaciones?')) {
-      setEvaluaciones([crearEvaluacionVacia()])
-      setErrores({})
+    if (semestreActivoId && confirm('¿Borrar todas las evaluaciones de este semestre?')) {
+      actualizarEvaluaciones(semestreActivoId, [crearEvaluacionVacia()])
     }
   }
 
   const actualizar = (id: string, campo: keyof Evaluacion, valor: string) => {
-    setErrores((prev) => {
-      const next = { ...prev }
-      delete next[id]
-      return next
-    })
-    setEvaluaciones((prev) =>
-      prev.map((e) => {
+    if (!semestreActivoId) return
+    actualizarEvaluaciones(
+      semestreActivoId,
+      evaluaciones.map((e) => {
         if (e.id !== id) return e
         if (campo === 'nota') {
           if (valor === '') return { ...e, nota: null }
@@ -126,31 +144,118 @@ export function CalculadoraNotas() {
     return null
   }
 
-  // Auto-focus en el último input al agregar
-  useEffect(() => {
-    // noop; UX mejora al tabular
-  }, [evaluaciones.length])
-
   const distribuibleRestante = 100 - resultado.sumaPonderaciones
 
   return (
     <>
       <SEO
-        title="Calculadora de Notas"
-        description="Calcula tu promedio ponderado al instante. Agrega evaluaciones con su nota y ponderación, y obtén tu promedio final."
+        title="Calculadora de Notas y Promedio Ponderado"
+        description="Calcula tu promedio ponderado al instante. Soporta múltiples semestres, guardado automático y validación de ponderaciones."
         canonical="/calculadora-de-notas"
-        keywords="calculadora de notas, promedio ponderado, calcular notas chile, simulador notas"
+        keywords="calculadora de notas, promedio ponderado, calcular notas chile, simulador notas, promedio semestral"
       />
 
       <div className="container-app py-8 sm:py-12">
         <div className="mb-6">
           <h1 className="text-3xl sm:text-4xl font-extrabold">Calculadora de Notas</h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Agrega tus evaluaciones con su ponderación y obtén tu promedio al instante.
+            Gestiona varios semestres localmente y obtén tu promedio ponderado al instante.
           </p>
         </div>
 
         <AdBannerTop />
+
+        {/* Selector de semestres */}
+        <Card className="mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+            <div className="flex-1 min-w-0">
+              <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+                Semestre activo
+              </label>
+              {editandoNombre && semestreActivo ? (
+                <div className="flex gap-2">
+                  <Input
+                    value={nombreTemp}
+                    onChange={(e) => setNombreTemp(e.target.value)}
+                    placeholder="Nombre del semestre"
+                    autoFocus
+                  />
+                  <Button onClick={handleRenombrar} size="sm">Guardar</Button>
+                  <Button onClick={() => setEditandoNombre(false)} variant="ghost" size="sm">
+                    Cancelar
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span
+                    className="inline-block h-3 w-3 rounded-full shrink-0"
+                    style={{ backgroundColor: semestreActivo?.color ?? '#3b82f6' }}
+                    aria-hidden="true"
+                  />
+                  <h2 className="text-xl font-bold truncate">{semestreActivo?.nombre ?? '—'}</h2>
+                  {semestreActivo && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNombreTemp(semestreActivo.nombre)
+                        setEditandoNombre(true)
+                      }}
+                      className="text-xs text-brand-600 dark:text-brand-400 hover:underline"
+                    >
+                      Renombrar
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {semestreActivo && semestres.length > 1 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleEliminar(semestreActivo.id, semestreActivo.nombre)}
+              >
+                Eliminar semestre
+              </Button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-2 mb-3">
+            {semestres.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setSemestreActivo(s.id)}
+                className={cn(
+                  'inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-all',
+                  s.id === semestreActivoId
+                    ? 'bg-brand-600 text-white shadow-soft'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                )}
+              >
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: s.color }}
+                  aria-hidden="true"
+                />
+                {s.nombre}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            <Input
+              placeholder="Nuevo semestre (ej: 2026-1, Cálculo I)"
+              value={nuevoSemestre}
+              onChange={(e) => setNuevoSemestre(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCrear()}
+              className="flex-1"
+            />
+            <Button onClick={handleCrear} variant="outline" leftIcon={<PlusIcon />}>
+              Crear
+            </Button>
+          </div>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Columna principal */}
@@ -167,32 +272,39 @@ export function CalculadoraNotas() {
               />
 
               <div className="space-y-3">
+                {evaluaciones.length === 0 && (
+                  <div className="text-center py-10 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                      Aún no hay evaluaciones en este semestre.
+                    </p>
+                    <Button onClick={agregar} size="sm" leftIcon={<PlusIcon />}>
+                      Agregar primera evaluación
+                    </Button>
+                  </div>
+                )}
+
                 {evaluaciones.map((evaluacion, idx) => {
-                  const err = validarEvaluacion(evaluacion) || errores[evaluacion.id]
+                  const err = validarEvaluacion(evaluacion)
                   return (
                     <div
                       key={evaluacion.id}
                       className={cn(
                         'rounded-xl border bg-white dark:bg-gray-800/50 p-4 transition-colors',
-                        err
-                          ? 'border-red-300 dark:border-red-700'
-                          : 'border-gray-200 dark:border-gray-700'
+                        err ? 'border-red-300 dark:border-red-700' : 'border-gray-200 dark:border-gray-700'
                       )}
                     >
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                           Evaluación {idx + 1}
                         </span>
-                        {evaluaciones.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => eliminar(evaluacion.id)}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
-                            aria-label={`Eliminar evaluación ${idx + 1}`}
-                          >
-                            <TrashIcon />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => eliminar(evaluacion.id)}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
+                          aria-label={`Eliminar evaluación ${idx + 1}`}
+                        >
+                          <TrashIcon />
+                        </button>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                         <div className="sm:col-span-6">
@@ -239,14 +351,16 @@ export function CalculadoraNotas() {
                 })}
               </div>
 
-              <div className="mt-5 flex flex-col sm:flex-row gap-2">
-                <Button onClick={agregar} variant="outline" leftIcon={<PlusIcon />} fullWidth>
-                  Agregar otra evaluación
-                </Button>
-                <Button onClick={limpiar} variant="ghost" fullWidth>
-                  Limpiar todo
-                </Button>
-              </div>
+              {evaluaciones.length > 0 && (
+                <div className="mt-5 flex flex-col sm:flex-row gap-2">
+                  <Button onClick={agregar} variant="outline" leftIcon={<PlusIcon />} fullWidth>
+                    Agregar otra evaluación
+                  </Button>
+                  <Button onClick={limpiar} variant="ghost" fullWidth>
+                    Limpiar evaluaciones
+                  </Button>
+                </div>
+              )}
             </Card>
 
             <AdBannerMiddle />
@@ -256,7 +370,13 @@ export function CalculadoraNotas() {
               <ProgressBar
                 value={resultado.sumaPonderaciones}
                 max={100}
-                color={resultado.sumaPonderaciones === 100 ? 'success' : resultado.sumaPonderaciones > 100 ? 'danger' : 'warning'}
+                color={
+                  resultado.sumaPonderaciones === 100
+                    ? 'success'
+                    : resultado.sumaPonderaciones > 100
+                      ? 'danger'
+                      : 'warning'
+                }
                 showLabel
                 label={`Total: ${resultado.sumaPonderaciones.toFixed(1)}% / 100%`}
               />
@@ -326,10 +446,16 @@ export function CalculadoraNotas() {
                     disabled={!resultado.valido}
                     fullWidth
                     className="mt-6"
-                    leftIcon={<SaveIcon />}
                   >
                     Guardar en historial
                   </Button>
+
+                  <Link
+                    to="/dashboard"
+                    className="mt-3 text-xs text-brand-600 dark:text-brand-400 hover:underline inline-block"
+                  >
+                    Ver dashboard con gráficos →
+                  </Link>
                 </div>
               </Card>
 
@@ -413,15 +539,6 @@ function XIcon() {
   return (
     <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M18 6 6 18M6 6l12 12" />
-    </svg>
-  )
-}
-function SaveIcon() {
-  return (
-    <svg {...ICON_BASE}>
-      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-      <polyline points="17 21 17 13 7 13 7 21" />
-      <polyline points="7 3 7 8 15 8" />
     </svg>
   )
 }

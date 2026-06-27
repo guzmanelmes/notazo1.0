@@ -10,10 +10,19 @@ export interface Evaluacion {
   ponderacion: number
 }
 
+/** Semestre / ramo con sus evaluaciones */
+export interface Semestre {
+  id: string
+  nombre: string
+  evaluaciones: Evaluacion[]
+  color: string
+  createdAt: string
+}
+
 /** Entrada del historial local */
 export interface HistoryEntry {
   id: string
-  tipo: 'promedio' | 'que-necesito' | 'examen' | 'eximicion'
+  tipo: 'promedio' | 'que-necesito' | 'examen' | 'eximicion' | 'puntaje' | 'nem'
   titulo: string
   resumen: string
   datos: Record<string, unknown>

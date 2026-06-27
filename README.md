@@ -2,15 +2,16 @@
 
 > **Calcula tus notas, proyecta tu futuro.**
 
-Aplicación web estática y moderna orientada a estudiantes de enseñanza media y universitarios de Chile. Permite calcular promedios ponderados, descubrir qué nota se necesita para aprobar, simular exámenes finales y eximiciones. Todo se guarda localmente en el navegador — sin servidor, sin base de datos, sin registro.
+Aplicación web estática y moderna orientada a estudiantes de enseñanza media y universitarios de Chile. Permite calcular promedios ponderados, descubrir qué nota se necesita para aprobar, convertir puntajes a notas chilenas, simular exámenes finales, eximiciones y NEM — todo con un dashboard con gráficos y un blog educativo integrado.
 
-Hecha con **React + Vite + TypeScript + TailwindCSS + React Router**. Optimizada para SEO, lista para monetizar con Google AdSense y desplegar gratis en Vercel.
+Hecha con **React + Vite + TypeScript + TailwindCSS + React Router**. Todo se guarda localmente en el navegador (sin servidor, sin base de datos, sin registro). Optimizada para SEO, lista para monetizar con Google AdSense y desplegar gratis en Vercel.
 
 ---
 
 ## Tabla de contenidos
 
 - [Características](#características)
+- [Páginas](#páginas)
 - [Stack técnico](#stack-técnico)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Ejecutar localmente](#ejecutar-localmente)
@@ -22,23 +23,58 @@ Hecha con **React + Vite + TypeScript + TailwindCSS + React Router**. Optimizada
 - [SEO y posicionamiento](#seo-y-posicionamiento)
 - [Accesibilidad](#accesibilidad)
 - [Personalización](#personalización)
-- [Créditos](#créditos)
 
 ---
 
 ## Características
 
-- **Calculadora de promedio ponderado** con validación de ponderaciones.
+### Herramientas
+- **Calculadora de promedio ponderado** multi-semestre (gestiona varios ramos/cursos localmente).
 - **¿Qué nota necesito?** para alcanzar un objetivo académico.
+- **Convertidor Puntaje → Nota** (escala 1.0-7.0, con exigencia configurable).
+- **Calculadora NEM** (Notas de Enseñanza Media para la PAES).
 - **Calculadora de examen final** con nota de presentación.
 - **Simulador de eximición** con indicador visual.
+- **Dashboard con gráficos** (recharts): promedios por semestre, distribución de notas.
 - **Historial local** con exportación a PDF.
-- **Modo oscuro** automático según sistema o manual.
+- **Escala de Notas** con equivalencias internacionales.
+
+### Blog SEO
+- 5 artículos iniciales optimizados para keywords chilenas:
+  - Cómo calcular promedio ponderado
+  - Qué nota necesito para aprobar
+  - Convertir puntaje a nota
+  - NEM y PAES
+  - Cómo eximir el examen final
+
+### Sistema
+- **Modo oscuro** automático o manual.
 - **Mobile first**, totalmente responsive.
 - **SEO optimizado** con React Helmet, Open Graph, Schema.org, sitemap y robots.txt.
-- **Espacios AdSense listos** en 4 posiciones (top, middle, bottom, sidebar).
+- **Espacios AdSense listos** en 4 posiciones.
 - **Accesibilidad WCAG**: navegación por teclado, etiquetas ARIA, contraste adecuado.
 - **100% offline**: una vez cargada, la app sigue funcionando sin internet.
+- **Multi-semestre local**: cada "ramo" o "semestre" se guarda por separado en LocalStorage.
+
+---
+
+## Páginas
+
+| Ruta | Descripción |
+|------|-------------|
+| `/` | Inicio con hero, herramientas, features y FAQ |
+| `/calculadora-de-notas` | Promedio ponderado multi-semestre |
+| `/que-nota-necesito` | Cálculo de nota objetivo |
+| `/puntaje-a-nota` | Conversor de puntaje bruto a nota 1.0-7.0 |
+| `/nem` | Calculadora NEM (Notas de Enseñanza Media) |
+| `/calculadora-examen-final` | Nota mínima en examen para aprobar |
+| `/simulador-eximicion` | Verifica si te eximes |
+| `/escala-de-notas` | Guía educativa de la escala chilena |
+| `/dashboard` | Gráficos y estadísticas |
+| `/blog` | Listado de artículos |
+| `/blog/:slug` | Artículo individual |
+| `/historial` | Historial con export a PDF |
+| `*` | Página 404 |
 
 ---
 
@@ -47,14 +83,16 @@ Hecha con **React + Vite + TypeScript + TailwindCSS + React Router**. Optimizada
 | Capa              | Tecnología                           |
 | ----------------- | ------------------------------------ |
 | UI                | React 18                             |
-| Lenguaje          | TypeScript 5                         |
+| Lenguaje          | TypeScript 5 (strict)                |
 | Bundler           | Vite 5                               |
 | Estilos           | TailwindCSS 3                        |
-| Routing           | React Router 6                       |
+| Routing           | React Router 6 (lazy loading)        |
+| Gráficos          | Recharts 2                           |
 | SEO               | React Helmet Async                   |
-| Persistencia      | LocalStorage (hook `useLocalStorage`)|
+| Persistencia      | LocalStorage (hook tipado)           |
+| Markdown          | react-markdown (para el blog)        |
 | Exportación PDF   | jsPDF                                |
-| Iconos            | SVG inline (Lucide-style)            |
+| Iconos            | SVG inline                           |
 | Fuente            | Inter (Google Fonts)                 |
 
 ---
@@ -65,6 +103,7 @@ Hecha con **React + Vite + TypeScript + TailwindCSS + React Router**. Optimizada
 notazo/
 ├── public/
 │   ├── favicon.svg
+│   ├── og-image.svg
 │   ├── robots.txt
 │   └── sitemap.xml
 ├── src/
@@ -74,11 +113,12 @@ notazo/
 │   │   ├── seo/                  # SEO (Helmet)
 │   │   └── ui/                   # Button, Card, Input, Loader, ProgressBar, ScrollToTop, ThemeToggle
 │   ├── context/                  # ThemeContext
-│   ├── hooks/                    # useLocalStorage, useHistory
-│   ├── lib/                      # calculations, pdfExport, utils
-│   ├── pages/                    # Home, CalculadoraNotas, QueNotaNecesito, CalculadoraExamenFinal, SimuladorEximicion, Historial, NotFound
+│   ├── data/                     # blog.ts (posts estáticos)
+│   ├── hooks/                    # useLocalStorage, useHistory, useSemestres
+│   ├── lib/                      # calculations, pdfExport, utils, scripts
+│   ├── pages/                    # Home, CalculadoraNotas, QueNotaNecesito, CalculadoraExamenFinal, SimuladorEximicion, PuntajeANota, Nem, EscalaNotas, Dashboard, Blog, BlogPost, Historial, NotFound
 │   ├── types/                    # Tipos globales
-│   ├── App.tsx                   # Rutas
+│   ├── App.tsx                   # Rutas (con lazy loading)
 │   ├── main.tsx                  # Entry point
 │   └── index.css                 # Tailwind + tokens
 ├── .env.example
@@ -90,6 +130,7 @@ notazo/
 ├── tsconfig.json
 ├── tsconfig.app.json
 ├── tsconfig.node.json
+├── vercel.json
 ├── vite.config.ts
 └── README.md
 ```
@@ -106,130 +147,89 @@ notazo/
 ### Pasos
 
 ```bash
-# 1. Clonar o descomprimir el proyecto
 cd notazo
-
-# 2. Instalar dependencias
 npm install
-
-# 3. Modo desarrollo
 npm run dev
 ```
 
-Abre [http://localhost:5173](http://localhost:5173) en tu navegador.
+Abre [http://localhost:5173](http://localhost:5173).
 
-### Otros scripts útiles
+### Otros scripts
 
 ```bash
 npm run build       # Build de producción (dist/)
 npm run preview     # Previsualizar el build
-npm run typecheck   # Verificar tipos TypeScript
-npm run lint        # Linter (si configuras ESLint)
+npm run typecheck   # Verificar tipos
 ```
-
----
-
-## Build de producción
-
-```bash
-npm run build
-```
-
-Genera una versión optimizada en `dist/` lista para subir a cualquier hosting estático (Vercel, Netlify, GitHub Pages, Cloudflare Pages, etc.).
 
 ---
 
 ## Despliegue en Vercel
 
-### Opción 1: Desde GitHub (recomendado)
+### Desde GitHub
 
 1. Sube el proyecto a un repo de GitHub.
 2. Entra a [vercel.com](https://vercel.com) y haz login con GitHub.
-3. Click en **"Add New → Project"**.
-4. Selecciona el repo `notazo`.
-5. Vercel detecta automáticamente que es un proyecto **Vite**:
-   - Framework Preset: **Vite**
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-6. Click en **Deploy**.
+3. Click **Add New → Project**, selecciona el repo.
+4. Vercel detecta automáticamente que es **Vite**.
+5. **Deploy**.
 
 Cada push a `main` redespliega automáticamente.
 
-### Opción 2: CLI
+### Variables de entorno en Vercel
 
-```bash
-npm i -g vercel
-vercel login
-vercel        # primer deploy (preproduccion)
-vercel --prod # promover a producción
+Antes de desplegar, ve a **Project Settings → Environment Variables** y agrega:
+
+```
+VITE_ADSENSE_CLIENT = ca-pub-XXXXXXXXXXXXXXXX
+VITE_ADSENSE_SLOT_TOP = 1234567890
+VITE_ADSENSE_SLOT_MIDDLE = 2345678901
+VITE_ADSENSE_SLOT_BOTTOM = 3456789012
+VITE_ADSENSE_SLOT_SIDEBAR = 4567890123
+VITE_GA4_ID = G-XXXXXXXXXX
 ```
 
-### Configuración adicional
-
-Para SPA routing (que `/que-nota-necesito` funcione al recargar), crea un archivo `vercel.json` en la raíz:
-
-```json
-{
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ]
-}
-```
-
-(Vite + Vercel suelen manejarlo automáticamente, pero este archivo asegura el comportamiento en cualquier configuración.)
+Si no los defines, la app funciona igual sin AdSense ni Analytics.
 
 ---
 
 ## Configurar Google AdSense
 
 1. Solicita tu cuenta en [adsense.google.com](https://adsense.google.com).
-2. Una vez aprobada, copia tu **ID de cliente** (ej: `ca-pub-1234567890123456`).
-3. Edita `src/components/ads/AdPlaceholder.tsx` y reemplaza el placeholder por tu bloque AdSense:
+2. Una vez aprobada, copia tu **ID de cliente** (`ca-pub-1234567890123456`).
+3. Define las env vars en `.env.local` (desarrollo) y en Vercel (producción):
+   ```
+   VITE_ADSENSE_CLIENT=ca-pub-XXXXXXXXXXXXXXXX
+   VITE_ADSENSE_SLOT_TOP=...
+   VITE_ADSENSE_SLOT_MIDDLE=...
+   VITE_ADSENSE_SLOT_BOTTOM=...
+   VITE_ADSENSE_SLOT_SIDEBAR=...
+   ```
+4. Edita `src/components/ads/AdPlaceholder.tsx` y reemplaza el placeholder visual por el bloque AdSense real:
 
-```html
+```jsx
 <ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-     data-ad-slot="XXXXXXXXXX"
+     style={{ display: 'block' }}
+     data-ad-client={ADSENSE_CONFIG.client}
+     data-ad-slot={ADSENSE_CONFIG.slots.top}
      data-ad-format="auto"
      data-full-width-responsive="true"></ins>
 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 ```
 
-4. Carga el script de AdSense en `index.html`:
-
-```html
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
-```
-
-5. Crea los slots de anuncios en tu panel de AdSense y reemplaza los `data-ad-slot` en cada componente.
-
-Los 4 espacios preparados son:
-
-- **AdBannerTop**: arriba del contenido principal (`<AdBannerTop />`)
-- **AdBannerMiddle**: dentro del contenido (`<AdBannerMiddle />`)
-- **AdBannerBottom**: antes del footer (`<AdBannerBottom />`)
-- **AdSidebar**: solo en pantallas grandes (`<AdSidebar />`)
-
-**Tip**: No satures la página. Una buena combinación es: Top + Middle + Sidebar.
+5. Crea las unidades de anuncios en tu panel de AdSense y usa los IDs en los slots.
 
 ---
 
 ## Configurar Google Analytics 4
 
 1. Crea una propiedad GA4 en [analytics.google.com](https://analytics.google.com).
-2. Copia tu **Measurement ID** (formato `G-XXXXXXXXXX`).
-3. Agrega en `index.html` antes de `</head>`:
-
-```html
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX');
-</script>
-```
+2. Copia tu **Measurement ID** (`G-XXXXXXXXXX`).
+3. Define la env var:
+   ```
+   VITE_GA4_ID=G-XXXXXXXXXX
+   ```
+4. Listo. El script se inyecta automáticamente en build time.
 
 ---
 
@@ -237,56 +237,52 @@ Los 4 espacios preparados son:
 
 1. Entra a [search.google.com/search-console](https://search.google.com/search-console).
 2. Agrega tu propiedad (`https://notazo.cl`).
-3. Verifica el dominio con el método **HTML tag** o **DNS**.
-4. Envía tu sitemap: `https://notazo.cl/sitemap.xml`.
+3. Verifica con HTML tag o DNS.
+4. Envía el sitemap: `https://notazo.cl/sitemap.xml`.
 
 ---
 
 ## SEO y posicionamiento
 
-Ya viene optimizado para SEO. Incluye:
-
-- **Meta títulos y descripciones** dinámicas por página (vía `<SEO />` + React Helmet).
-- **Open Graph** y **Twitter Cards** para compartir en redes sociales.
-- **Canonical URLs** para evitar contenido duplicado.
-- **Schema.org JSON-LD** (`EducationalOrganization` y `WebSite` con SearchAction).
-- **Sitemap.xml** en `/public/sitemap.xml`.
-- **Robots.txt** en `/public/robots.txt`.
-- **URLs amigables** en español (`/que-nota-necesito`, `/simulador-eximicion`).
-- **HTML semántico**: `<header>`, `<main>`, `<nav>`, `<footer>`, `<article>`, `<section>`.
-- **Lazy loading** de páginas (Suspense) para mejor Core Web Vitals.
-- **Code splitting** automático por Vite.
+- **Meta títulos y descripciones** dinámicas por página (React Helmet).
+- **Open Graph** y **Twitter Cards**.
+- **Canonical URLs**.
+- **Schema.org JSON-LD** (`EducationalOrganization`, `WebSite`, `BlogPosting`).
+- **Sitemap.xml** con 14 URLs.
+- **Robots.txt**.
+- **URLs amigables** en español.
+- **HTML semántico** completo.
+- **Lazy loading** de páginas (mejor Core Web Vitals).
+- **Code splitting** automático (Recharts y jsPDF en chunks separados).
+- **Prose styling** para el blog con tipografía optimizada.
 
 ### Palabras clave objetivo
 
 ```
 calculadora de notas chile
-calcular promedio
-qué nota necesito
-calculadora de examen
-promedio ponderado
+calcular promedio ponderado
+qué nota necesito para aprobar
+calculadora de examen chile
+promedio ponderado fórmula
 simulador de notas
-calculadora notas universidad
-calculadora notas enseñanza media
+puntaje a nota
+calculadora NEM
+NEM PAES
+escala de notas chile
+convertir puntaje a nota
 ```
-
-### Próximos pasos para SEO
-
-- Crear contenido tipo blog: "Cómo calcular promedio ponderado en Chile".
-- Generar backlinks desde foros y redes sociales.
-- Registrar en Google Search Console y Bing Webmaster Tools.
 
 ---
 
 ## Accesibilidad
 
-- **WCAG AA** cumplido en contraste de colores.
-- **Navegación por teclado** completa (focus visible).
+- **WCAG AA** cumplido en contraste.
+- **Navegación por teclado** con focus visible.
 - **Etiquetas ARIA** en componentes interactivos.
-- **Texto alternativo** en iconos (`aria-hidden` cuando son decorativos).
 - **Skip link** para saltar al contenido principal.
-- **Reduced motion**: respeta `prefers-reduced-motion`.
-- **Roles semánticos**: `navigation`, `main`, `contentinfo`, `progressbar`, `alert`, `status`.
+- **Reduced motion** respetado.
+- **Roles semánticos** completos.
+- **text-balance** para títulos.
 
 ---
 
@@ -294,50 +290,44 @@ calculadora notas enseñanza media
 
 ### Cambiar colores
 
-Edita `tailwind.config.js` en `theme.extend.colors.brand`:
+Edita `tailwind.config.js` → `theme.extend.colors.brand`:
 
 ```js
 brand: {
   600: '#TU_COLOR_PRIMARIO',
-  // ...
 }
 ```
 
-### Cambiar el eslogan
+### Agregar más posts al blog
 
-Busca y reemplaza en:
-- `src/components/layout/Navbar.tsx`
-- `src/components/layout/Footer.tsx`
-- `index.html`
+Edita `src/data/blog.ts` y agrega un nuevo objeto `BlogPost`. El sistema lo renderiza automáticamente.
 
 ### Agregar más páginas
 
-1. Crea el componente en `src/pages/MiPagina.tsx`.
-2. Agrégalo como ruta en `src/App.tsx` con `lazy`.
-3. Agrega un `<NavLink>` en `src/components/layout/Navbar.tsx`.
-4. Crea un `<SEO />` con título y descripción únicos.
+1. Crea `src/pages/MiPagina.tsx`.
+2. Agrégalo a `src/App.tsx` con `lazy`.
+3. Agrega `<NavLink>` en `src/components/layout/Navbar.tsx`.
+4. Agrega `<SEO />` con título y descripción únicos.
 5. Agrega la URL a `public/sitemap.xml`.
 
 ---
 
 ## Notas técnicas
 
-- La aplicación **no envía datos a ningún servidor**. Todo se guarda en `localStorage` del navegador.
-- Los cálculos usan la **escala chilena 1.0 – 7.0** con nota de aprobación 4.0.
-- El **promedio ponderado** se calcula como `Σ(nota × ponderación) / 100`.
-- La **nota necesaria** se calcula con la fórmula `(objetivo − actual × (100 − p) / 100) / (p / 100)`.
-- El **PDF** se genera client-side con jsPDF (no requiere servidor).
+- **Sin backend**: todo se guarda en LocalStorage del navegador.
+- **Escala chilena 1.0-7.0** con nota de aprobación 4.0.
+- **Promedio ponderado**: `Σ(nota × ponderación) / 100`.
+- **Nota necesaria**: `(objetivo − actual × (100 − p) / 100) / (p / 100)`.
+- **Conversión puntaje → nota**: regla de tres en dos tramos.
+- **NEM**: promedio simple de 1° a 4° medio.
+- **PDF**: generado client-side con jsPDF.
 
 ---
 
 ## Licencia
 
-MIT — úsalo, modifícalo y distribúyelo libremente. Si publicas una versión mejorada, menciónanos como inspiración. 🇨🇱
+MIT — úsalo, modifícalo y distribúyelo libremente.
 
 ---
 
-## Créditos
-
-Hecho con cariño para los estudiantes chilenos.
-
-**Notazo** — *Calcula tus notas, proyecta tu futuro.*
+**Notazo** — *Calcula tus notas, proyecta tu futuro.* 🇨🇱

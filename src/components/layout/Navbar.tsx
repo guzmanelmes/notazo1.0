@@ -5,10 +5,10 @@ import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
   { to: '/calculadora-de-notas', label: 'Calculadora' },
-  { to: '/que-nota-necesito', label: 'Qué nota necesito' },
-  { to: '/calculadora-examen-final', label: 'Examen final' },
-  { to: '/simulador-eximicion', label: 'Eximición' },
-  { to: '/historial', label: 'Historial' },
+  { to: '/que-nota-necesito', label: '¿Qué nota?' },
+  { to: '/puntaje-a-nota', label: 'Puntaje → Nota' },
+  { to: '/nem', label: 'NEM' },
+  { to: '/dashboard', label: 'Dashboard' },
 ]
 
 export function Navbar() {
@@ -77,6 +77,36 @@ export function Navbar() {
               </NavLink>
             </li>
           ))}
+          <li>
+            <NavLink
+              to="/escala-de-notas"
+              className={({ isActive }) =>
+                cn(
+                  'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                )
+              }
+            >
+              Escala
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/blog"
+              className={({ isActive }) =>
+                cn(
+                  'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                )
+              }
+            >
+              Blog
+            </NavLink>
+          </li>
         </ul>
 
         {/* Right actions */}
@@ -108,7 +138,7 @@ export function Navbar() {
         id="mobile-menu"
         className={cn(
           'lg:hidden border-t border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-300',
-          open ? 'max-h-96' : 'max-h-0'
+          open ? 'max-h-[36rem]' : 'max-h-0'
         )}
       >
         <ul className="container-app py-2 space-y-1">
@@ -129,6 +159,81 @@ export function Navbar() {
               </NavLink>
             </li>
           ))}
+          <li>
+            <NavLink
+              to="/escala-de-notas"
+              className={({ isActive }) =>
+                cn(
+                  'block px-3 py-3 rounded-lg text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                )
+              }
+            >
+              Escala de Notas
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/simulador-eximicion"
+              className={({ isActive }) =>
+                cn(
+                  'block px-3 py-3 rounded-lg text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                )
+              }
+            >
+              Simulador de Eximición
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/calculadora-examen-final"
+              className={({ isActive }) =>
+                cn(
+                  'block px-3 py-3 rounded-lg text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                )
+              }
+            >
+              Examen Final
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/historial"
+              className={({ isActive }) =>
+                cn(
+                  'block px-3 py-3 rounded-lg text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                )
+              }
+            >
+              Historial
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/blog"
+              className={({ isActive }) =>
+                cn(
+                  'block px-3 py-3 rounded-lg text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                )
+              }
+            >
+              Blog
+            </NavLink>
+          </li>
         </ul>
       </div>
     </header>
