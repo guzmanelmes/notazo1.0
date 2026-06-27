@@ -474,23 +474,6 @@ function ChartIcon() {
   )
 }
 
-function BookIcon() {
-  return (
-    <svg {...ICON_BASE} aria-hidden="true">
-      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
-    </svg>
-  )
-}
-
-function AwardIcon() {
-  return (
-    <svg {...ICON_BASE} aria-hidden="true">
-      <circle cx="12" cy="8" r="6" />
-      <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
-    </svg>
-  )
-}
-
 function ShieldIcon() {
   return (
     <svg {...ICON_BASE} aria-hidden="true">
@@ -532,15 +515,6 @@ function CloudIcon() {
   return (
     <svg {...ICON_BASE} aria-hidden="true">
       <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
-    </svg>
-  )
-}
-
-function FileIcon() {
-  return (
-    <svg {...ICON_BASE} aria-hidden="true">
-      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-      <polyline points="14 2 14 8 20 8" />
     </svg>
   )
 }

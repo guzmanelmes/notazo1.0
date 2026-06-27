@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
-import ReactMarkdown from 'react-markdown'
 import { SEO } from '@/components/seo/SEO'
-import { Card, CardHeader } from '@/components/ui/Card'
+import { Card } from '@/components/ui/Card'
 import { AdBannerTop } from '@/components/ads/AdBannerTop'
 import { AdBannerBottom } from '@/components/ads/AdBannerBottom'
 import { AdBannerMiddle } from '@/components/ads/AdBannerMiddle'

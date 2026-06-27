@@ -8,8 +8,6 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
@@ -17,7 +15,6 @@ import {
 } from 'recharts'
 import { SEO } from '@/components/seo/SEO'
 import { Card, CardHeader } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
 import { AdBannerTop } from '@/components/ads/AdBannerTop'
 import { AdBannerBottom } from '@/components/ads/AdBannerBottom'
 import { AdBannerMiddle } from '@/components/ads/AdBannerMiddle'
